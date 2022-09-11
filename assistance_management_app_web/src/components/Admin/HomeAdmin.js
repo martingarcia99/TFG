@@ -28,7 +28,6 @@ const HomeAdmin = () => {
         const querySnapshot = await getDocs(q2)
         
         querySnapshot.forEach(async (docu) => {
-
             
             const querySnapshot2 = await getDocs(collection(db, "students"));
 
@@ -51,8 +50,14 @@ const HomeAdmin = () => {
                 await deleteDoc(scheduleDoc)
             })
 
-            const subjectDoc = doc(db,"subjects",docu.id)
-            await deleteDoc(subjectDoc)
+            const q4 = query(collection(db, "assistance"), where("asignatura", "==", docu.id))
+            const querySnapshot4 = await getDocs(q4)
+
+            querySnapshot4.forEach(async (doc4) => {
+                const assistanceDoc = doc(db,"assistance",doc4.id)
+                await deleteDoc(assistanceDoc)
+            })
+            
         })
 
         const teacherDoc = doc(db,"teachers",id)

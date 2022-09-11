@@ -163,11 +163,15 @@ const ShowSubject = () => {
                     await sendPasswordResetEmail(auth,d.correo)
                 }else if (querySnapshot.size === 1) {
                     const ref = doc(db, "students", idStudent)
-                    asignaturas.push(id)
-                    await updateDoc(ref, {
-                        asignaturas: asignaturas
-                    })
+                    const docSnap = await getDoc(ref);
+                    if(!docSnap.data().asignaturas.includes(id)){
+                        asignaturas.push(id)
+                        await updateDoc(ref, {
+                            asignaturas: asignaturas
+                        })
+                    }
                 }
+                    
     
             })
         })

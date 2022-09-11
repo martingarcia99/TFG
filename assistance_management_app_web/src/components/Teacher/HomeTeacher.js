@@ -1,7 +1,7 @@
 import React from 'react'
 import {useState,useEffect} from 'react'
 import {db} from '../../firebase-config'
-import {collection, getDocs,doc,deleteDoc,where,query} from 'firebase/firestore'
+import {collection, getDocs,doc,deleteDoc,where,query,updateDoc} from 'firebase/firestore'
 import Button from 'react-bootstrap/Button'
 import {useNavigate} from 'react-router-dom'
 import { BiBookBookmark } from "react-icons/bi";
@@ -17,6 +17,36 @@ const HomeTeacher = () => {
     const {user} = useAuth()
 
     const deleteSubject= async(id) => {
+
+        const querySnapshot2 = await getDocs(collection(db, "students"));
+
+        querySnapshot2.forEach(async (doc2) => {
+            
+            if(doc2.data().asignaturas.includes(id)){
+                const newAsignaturas = doc2.data().asignaturas.filter((item) => item !== id)
+                const ref = doc(db, "students", doc2.id)
+                await updateDoc(ref, {
+                    asignaturas: newAsignaturas
+                })
+            }
+        });
+
+        const q3 = query(collection(db, "schedule"), where("idAsignatura", "==", id))
+        const querySnapshot3 = await getDocs(q3)
+
+        querySnapshot3.forEach(async (doc3) => {
+            const scheduleDoc = doc(db,"schedule",doc3.id)
+            await deleteDoc(scheduleDoc)
+        })
+
+        const q4 = query(collection(db, "assistance"), where("asignatura", "==", id))
+        const querySnapshot4 = await getDocs(q4)
+
+        querySnapshot4.forEach(async (doc4) => {
+            const assistanceDoc = doc(db,"assistance",doc4.id)
+            await deleteDoc(assistanceDoc)
+        })
+
         const subjectDoc = doc(db,"subjects",id)
         await deleteDoc(subjectDoc)
         window.location.reload()
